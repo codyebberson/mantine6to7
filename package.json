@@ -1,0 +1,83 @@
+{
+  "name": "mantine6to7",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "convert-blah": "ts-node src/main.ts",
+    "convert": "node --experimental-specifier-resolution=node --loader ts-node/esm src/main.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Medplum <hello@medplum.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/parser": "7.23.0",
+    "@babel/traverse": "7.23.2",
+    "@babel/types": "7.23.0",
+    "@types/babel__traverse": "7.20.3",
+    "@types/node": "20.8.7",
+    "@types/prettier": "2.7.3",
+    "@typescript-eslint/eslint-plugin": "6.8.0",
+    "@typescript-eslint/parser": "6.8.0",
+    "eslint": "8.52.0",
+    "eslint-config-prettier": "9.0.0",
+    "eslint-plugin-prettier": "5.0.1",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "fast-glob": "3.3.1",
+    "prettier": "3.0.3",
+    "rimraf": "5.0.5",
+    "ts-node": "10.9.1",
+    "typescript": "5.2.2"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true
+  },
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "project": "./tsconfig.json",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "plugins": [
+      "@typescript-eslint"
+    ],
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:prettier/recommended",
+      "plugin:react-hooks/recommended",
+      "plugin:@builder.io/mitosis/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/explicit-module-boundary-types": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_"
+        }
+      ],
+      "no-control-regex": "off",
+      "prefer-promise-reject-errors": "error"
+    },
+    "ignorePatterns": [
+      "dist",
+      "node_modules",
+      "package-lock.json",
+      "packages/**/dist/",
+      "packages/compiler/output",
+      "packages/react/src/components/",
+      "packages/solid/src/components/",
+      "packages/styles/**/*.js",
+      "packages/**/*.cjs"
+    ]
+  }
+}
