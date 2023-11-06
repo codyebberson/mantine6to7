@@ -47,7 +47,8 @@ export function convertToCssModules(jsCode: string): string {
                   ';'
                 );
               });
-              cssContent += `.${styleName} {\n` + styleProps.join('\n') + '\n}\n';
+              cssContent +=
+                `.${styleName} {\n` + styleProps.map((s) => '  ' + s).join('\n') + '\n}\n';
             }
           }
         });
@@ -66,23 +67,27 @@ function camelToDash(str: string): string {
 }
 
 function convertCssValue(input: string): string {
-  if (input.startsWith('theme.')) {
-    let result = input
-      .replace('theme.', '')
-      .replace(/\./g, '-')
-      .replace(/\[/g, '-')
-      .replace(/\]/g, '');
-    return `var(--mantine-${result})`;
-  }
+  // +   "  background-color: var(--mantine-colorScheme === 'dark' ? theme-color-dark-6 : theme-colors-gray-0);n" +
+  // +   "  color: var(--mantine-colorScheme === 'dark' ? theme-white : theme-black);n" +
+  // -   '  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));n' +
+  // -   '  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));n' +
+
+  // Use regex to search for pattern:
+  // --mantine-colorScheme === 'dark' ? (.+) : (.+)
+  // and replace with:
+  // light-dark($1, $2)
+  input = input.replaceAll(/theme.colorScheme === 'dark' \? (.+) : (.+)/g, 'light-dark($2, $1)');
+
+  // theme.colors.red[5] -> var(--mantine-color-red-5)
+  input = input.replaceAll(/theme\.colors\.(\w+)\[(\d+)\]/g, 'var(--mantine-color-$1-$2)');
+
+  // theme.white
+  // var(--mantine-color-white)
+  input = input.replaceAll('theme.white', 'var(--mantine-color-white)');
+
+  // theme.black
+  // var(--mantine-color-black)
+  input = input.replaceAll('theme.black', 'var(--mantine-color-black)');
 
   return input;
 }
-
-const jsCode = `import { createStyles } from '@mantine/core';
-const useStyles = createStyles((theme) => ({
-  root: {
-    backgroundColor: theme.colors.red[5],
-  },
-}));`;
-
-console.log(convertToCssModules(jsCode));

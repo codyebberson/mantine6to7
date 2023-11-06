@@ -5,18 +5,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "convert-blah": "ts-node src/main.ts",
+    "build": "npx tsc",
     "convert": "node --experimental-specifier-resolution=node --loader ts-node/esm src/main.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test --experimental-specifier-resolution=node --loader ts-node/esm --no-warnings=ExperimentalWarning"
   },
   "keywords": [],
   "author": "Medplum <hello@medplum.com>",
   "license": "MIT",
   "devDependencies": {
-    "@babel/parser": "7.23.0",
-    "@babel/traverse": "7.23.2",
-    "@babel/types": "7.23.0",
-    "@types/babel__traverse": "7.20.3",
     "@types/node": "20.8.7",
     "@types/prettier": "2.7.3",
     "@typescript-eslint/eslint-plugin": "6.8.0",
