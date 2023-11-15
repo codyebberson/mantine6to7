@@ -1,65 +1,57 @@
-import ts from 'typescript';
-
 export function convertToCssModules(jsCode: string): string {
-  console.log('CODY jsCode', jsCode);
+  const lines = jsCode.split('\n');
+  const result: string[] = [];
+  for (let line of lines) {
+    // if (line.includes(': {')) {
+    //   // Remove the colon ":"
+    //   line = line.replace(':', '');
+    // }
 
-  const sourceFile = ts.createSourceFile(
-    'temp.ts',
-    jsCode,
-    ts.ScriptTarget.Latest,
-    true,
-    ts.ScriptKind.TS,
-  );
+    // if (line.includes('},')) {
+    //   // Remove the comma ","
+    //   // result.push(line.replace(',', ''));
+    //   line = line.replace(',', '');
+    // }
 
-  let cssContent = '';
-
-  function visit(node: ts.Node) {
-    if (
-      ts.isCallExpression(node) &&
-      ts.isIdentifier(node.expression) &&
-      node.expression.text === 'createStyles'
-    ) {
-      const stylesObj = node.arguments[0] as ts.ArrowFunction;
-      let objectExpr: ts.ObjectLiteralExpression | undefined;
-
-      if (stylesObj && ts.isParenthesizedExpression(stylesObj.body)) {
-        objectExpr = stylesObj.body.expression as ts.ObjectLiteralExpression;
-      }
-
-      if (stylesObj && stylesObj.body && ts.isBlock(stylesObj.body)) {
-        const returnStmt = stylesObj.body.statements.find(ts.isReturnStatement);
-        if (returnStmt?.expression) {
-          objectExpr = returnStmt.expression as ts.ObjectLiteralExpression;
-        }
-      }
-
-      if (objectExpr) {
-        objectExpr.properties.forEach((prop) => {
-          if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.name)) {
-            const styleName = prop.name.text;
-            if (ts.isObjectLiteralExpression(prop.initializer)) {
-              const styleProps = prop.initializer.properties.map((p) => {
-                const assignment = p as ts.PropertyAssignment;
-                return (
-                  camelToDash(assignment.name.getText()) +
-                  ': ' +
-                  convertCssValue(assignment.initializer.getText()) +
-                  ';'
-                );
-              });
-              cssContent +=
-                `.${styleName} {\n` + styleProps.map((s) => '  ' + s).join('\n') + '\n}\n';
-            }
-          }
-        });
-      }
+    if (line.startsWith('  ')) {
+      // Remove the leading spaces
+      line = line.slice(2);
     }
-    ts.forEachChild(node, visit);
+
+    const indent = line.indexOf(line.trim());
+
+    line = line.replaceAll(': {', ' {');
+    line = line.replaceAll('},', '}');
+
+    // If line starts with a letter, add a period to make it a class name
+    if (/^[a-zA-Z]/.test(line)) {
+      line = '.' + line;
+    }
+
+    if (line.includes('{')) {
+      // Remove quotes around selectors (i.e., "'&:hover'")
+      line = line.replaceAll("'", '');
+    }
+
+    if (line.endsWith(',')) {
+      line = line.slice(0, -1) + ';';
+    }
+
+    if (line.includes(':') && line.endsWith(';')) {
+      line = line.slice(0, -1);
+      const colonIndex = line.indexOf(':');
+      const key = line.substring(0, colonIndex).trim();
+      const value = line.substring(colonIndex + 1).trim();
+      // const [key, value] = line.split(':');
+      const newKey = camelToDash(key.trim());
+      const newValue = convertCssValue(value.trim());
+      line = `${' '.repeat(indent)}${newKey}: ${newValue};`;
+    }
+
+    result.push(line);
   }
-
-  visit(sourceFile);
-
-  return cssContent;
+  // return convertCssValue(jsCode);
+  return result.join('\n');
 }
 
 function camelToDash(str: string): string {
@@ -71,6 +63,19 @@ function convertCssValue(input: string): string {
   // +   "  color: var(--mantine-colorScheme === 'dark' ? theme-white : theme-black);n" +
   // -   '  background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));n' +
   // -   '  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));n' +
+
+  if (input.startsWith("'") && input.endsWith("'")) {
+    input = input.slice(1, -2);
+  }
+
+  if (input.startsWith('`') && input.endsWith('`')) {
+    input = input.slice(1, -2);
+  }
+
+  if (input.includes('${')) {
+    input = input.replaceAll('${', '');
+    input = input.replaceAll('}', '');
+  }
 
   // Use regex to search for pattern:
   // --mantine-colorScheme === 'dark' ? (.+) : (.+)
@@ -88,6 +93,11 @@ function convertCssValue(input: string): string {
   // theme.black
   // var(--mantine-color-black)
   input = input.replaceAll('theme.black', 'var(--mantine-color-black)');
+
+  // If the value is just an integer, add "px"
+  if (/^\d+$/.test(input)) {
+    input += 'px';
+  }
 
   return input;
 }
