@@ -2,22 +2,22 @@ import assert from 'node:assert';
 import { test } from 'node:test';
 import { convertToCssModules } from './css';
 
-// test('Simple', () => {
-//   const input = `import { createStyles } from '@mantine/core';
-// const useStyles = createStyles((theme) => ({
-//   root: {
-//     backgroundColor: theme.colors.red[5],
-//   },
-// }));
-// `;
+test('Simple', () => {
+  const input = `import { createStyles } from '@mantine/core';
+const useStyles = createStyles((theme) => ({
+  root: {
+    backgroundColor: theme.colors.red[5],
+  },
+}));
+`;
 
-//   const expected = `.root {
-//   background-color: var(--mantine-color-red-5);
-// }
-// `;
+  const expected = `.root {
+  background-color: var(--mantine-color-red-5);
+}
+`;
 
-//   assert.strictEqual(convertToCssModules(input), expected);
-// });
+  assert.strictEqual(convertToCssModules(input), expected);
+});
 
 test('Color scheme.', () => {
   const input = `import { createStyles } from '@mantine/core';

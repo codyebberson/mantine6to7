@@ -12,15 +12,9 @@ async function main(): Promise<void> {
   for (const fileName of files) {
     await convertFile(fileName);
   }
-  // await convert(ts.createProgram(rootNames, {}), files);
 }
 
 async function convertFile(fileName: string): Promise<void> {
-  // console.log('Processing ' + fileName);
-  // if (Date.now() > 0) {
-  //   return;
-  // }
-
   // Read file contents
   const contents = readFileSync(fileName, 'utf8');
 

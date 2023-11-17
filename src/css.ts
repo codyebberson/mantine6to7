@@ -65,11 +65,11 @@ function convertCssValue(input: string): string {
   // -   '  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));n' +
 
   if (input.startsWith("'") && input.endsWith("'")) {
-    input = input.slice(1, -2);
+    input = input.slice(1, -1);
   }
 
   if (input.startsWith('`') && input.endsWith('`')) {
-    input = input.slice(1, -2);
+    input = input.slice(1, -1);
   }
 
   if (input.includes('${')) {
