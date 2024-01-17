@@ -94,6 +94,22 @@ function convertCssValue(input: string): string {
   // var(--mantine-color-black)
   input = input.replaceAll('theme.black', 'var(--mantine-color-black)');
 
+  // theme.fontSizes.{xs,sm,md,lg,xl}
+  // var(--mantine-font-size-{xs,sm,md,lg,xl})
+  input = input.replaceAll(/theme\.fontSizes\.(\w+)/g, 'var(--mantine-font-size-$1)');
+
+  // theme.spacing.{xs,sm,md,lg,xl}
+  // var(--mantine-spacing-{xs,sm,md,lg,xl})
+  input = input.replaceAll(/theme\.spacing\.(\w+)/g, 'var(--mantine-spacing-$1)');
+
+  // theme.lineHeights.{xs,sm,md,lg,xl}
+  // var(--mantine-line-height-{xs,sm,md,lg,xl})
+  input = input.replaceAll(/theme\.lineHeights\.(\w+)/g, 'var(--mantine-line-height-$1)');
+
+  // theme.radius.{xs,sm,md,lg,xl}
+  // var(--mantine-radius-{xs,sm,md,lg,xl})
+  input = input.replaceAll(/theme\.radius\.(\w+)/g, 'var(--mantine-radius-$1)');
+
   // If the value is just an integer, add "px"
   if (/^\d+$/.test(input)) {
     input += 'px';
