@@ -5,7 +5,7 @@ import { convertToCssModules } from './css';
 
 const inputDir = '../medplum/packages/react';
 const startToken = '\nconst useStyles = createStyles(';
-const endToken = '\n});\n';
+const validEndTokens = ['\n});\n', '\n}));\n'];
 
 async function main(): Promise<void> {
   const files = (await fastGlob([inputDir + '/src/**/*.tsx'])).map((f) => resolve(f));
@@ -26,7 +26,17 @@ async function convertFile(fileName: string): Promise<void> {
   }
 
   // Find the end of the createStyles(...) call
-  const endIndex = contents.indexOf(endToken, startIndex);
+  let actualEndToken = '';
+  let endIndex = -1;
+
+  for (const endToken of validEndTokens) {
+    const currEndIndex = contents.indexOf(endToken, startIndex);
+    if (currEndIndex !== -1) {
+      actualEndToken = endToken;
+      endIndex = currEndIndex;
+      break;
+    }
+  }
   if (endIndex === -1) {
     // console.log('File ' + fileName + ' does not contain createStyles() (2)');
     return;
@@ -45,7 +55,7 @@ async function convertFile(fileName: string): Promise<void> {
   const newContents =
     contents.substring(0, startIndex) +
     `\nimport classes from './${basename(cssFileName)}';\n` +
-    contents.substring(endIndex + endToken.length);
+    contents.substring(endIndex + actualEndToken.length);
   writeFileSync(fileName, newContents, 'utf8');
 }
 
